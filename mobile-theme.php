@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: Mobile Theme
-Tags: presslabs, theme, mobile, template, style, stylesheet, switches
-Description: This plugin switches the current theme to the mobile one when it detects a mobile device. This plugin works only on PressLabs servers!
-Author: PressLabs
-Version: 1.0
-Author URI: http://www.presslabs.com/
+ * Plugin Name: Mobile Theme
+ * Tags: presslabs, theme, mobile, template, style, stylesheet, switches
+ * Description: This plugin switches the current theme to the mobile one when it detects a mobile device. This plugin works only on PressLabs servers!
+ * Author: PressLabs
+ * Version: 1.1
+ * Author URI: http://www.presslabs.com/
 */
 
 //
@@ -169,3 +169,10 @@ $mobile_theme_stylesheet = get_option('mobile_theme_mobile_theme_stylesheet');
 </div>
 <?php
 }
+
+//---------------------------------------------------------
+function mobile_theme_add_header_x_pl_mobilized() {
+	header('X-PL-Mobilized: Yes');
+}
+add_action('send_headers', 'mobile_theme_add_header_x_pl_mobilized');
+
