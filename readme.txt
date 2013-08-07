@@ -3,15 +3,15 @@ Contributors: PressLabs
 Donate link: http://www.presslabs.com/
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: 1.1
+Stable tag: 1.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-This plugin switches the current theme to the mobile one when it detects a mobile device. This plugin works only on PressLabs servers!
+This plugin switches the current theme to the mobile one when it detects a mobile device.
 
 == Description ==
 
-This plugin switches the current theme to the mobile one when it detects a mobile device. This plugin works only on PressLabs servers!
+This plugin switches the current theme to the mobile one when it detects a mobile device.
 
 = Github repository =
 https://github.com/PressLabs/mobile-theme
@@ -22,6 +22,9 @@ To install, simple extract the 'mobile-theme.php' file into your 'wp-content/plu
 
 == Changelog ==
 
+= 1.2 =
+* add User Agent String parser(now the plugin is working on every server not only on PressLabs servers)
+
 = 1.1 =
 * add header 'X-PL-Mobilized'
 
@@ -29,6 +32,9 @@ To install, simple extract the 'mobile-theme.php' file into your 'wp-content/plu
 * initial release
 
 == Upgrade Notice ==
+
+= 1.2 =
+Add User Agent String parser(now the plugin is working on every server not only on PressLabs servers).
 
 = 1.1 =
 Add header 'X-PL-Mobilized'
