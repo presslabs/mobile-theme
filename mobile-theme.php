@@ -4,9 +4,38 @@
  * Tags: presslabs, theme, mobile, template, style, stylesheet, switches
  * Description: This plugin switches the current theme to the mobile one when it detects a mobile device. This plugin works only on PressLabs servers!
  * Author: PressLabs
- * Version: 1.2
+ * Version: 1.3
  * Author URI: http://www.presslabs.com/
 */
+
+//------------------------------------------------------------------------------
+// Return PressLabs User Agent String Parser For Mobile Devices
+//
+function mobile_theme_pl_uas_parser() {
+	if (isset($_SERVER['HTTP_X_PL_VARIANT']) && ($_SERVER['HTTP_X_PL_VARIANT']=='mobile')) return true;
+
+	return false;
+}
+//------------------------------------------------------------------------------
+// Jetpack hook
+//
+if (has_filter('jetpack_check_mobile'))
+	add_filter('jetpack_check_mobile', 'mobile_theme_pl_uas_parser');
+if (has_filter('jetpack_is_mobile_filter'))
+	add_filter('jetpack_is_mobile_filter', 'mobile_theme_pl_uas_parser');
+//------------------------------------------------------------------------------
+// WordPress Mobile Pack hook
+// wordpress-mobile-pack/plugins/wpmp_switcher/wpmp_switcher.php: Line:459:
+//   return apply_filters('wordpress_mobile_pack_is_mobile_browser', $wpmp_switcher_is_mobile_browser);
+if (has_filter('wordpress_mobile_pack_is_mobile_browser'))
+	add_filter('wordpress_mobile_pack_is_mobile_browser', 'mobile_theme_pl_uas_parser');
+//------------------------------------------------------------------------------
+// WPtouch hook
+// wptouch/wptouch.php: Line:688:
+// $is_mobile = $wptouch_plugin->applemobile && $wptouch_plugin->desired_view == 'mobile';
+// return apply_filters('bnc_wptouch_is_mobile_filter', $is_mobile);
+if (has_filter('bnc_wptouch_is_mobile_filter'))
+	add_filter('bnc_wptouch_is_mobile_filter', 'mobile_theme_pl_uas_parser');
 
 //------------------------------------------------------------------------------
 // User Agent String parser(based on http://notnotmobile.appspot.com/)
