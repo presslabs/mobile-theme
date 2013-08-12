@@ -4,107 +4,87 @@
  * Tags: presslabs, theme, mobile, template, style, stylesheet, switches
  * Description: This plugin switches the current theme to the mobile one when it detects a mobile device. This plugin works only on PressLabs servers!
  * Author: PressLabs
- * Version: 1.3
+ * Version: 1.3.1
  * Author URI: http://www.presslabs.com/
 */
+
+$use_mt_theme = true;
+
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+define('MT_PREFFIX', "\n\rrand_" . mt_rand(100, 999) . ': ');
 
 //------------------------------------------------------------------------------
 // Return PressLabs User Agent String Parser For Mobile Devices
 //
 function mobile_theme_pl_uas_parser() {
-	if (isset($_SERVER['HTTP_X_PL_VARIANT']) && ($_SERVER['HTTP_X_PL_VARIANT']=='mobile')) return true;
+	$rez = array('DESKTOP','MOBIL');
+	$result = false; // by default is desktop
 
-	return false;
+	if ( isset($_SERVER['HTTP_X_PL_VARIANT']) )
+		if ( $_SERVER['HTTP_X_PL_VARIANT']=='mobile' )
+			$result = true; // is mobile
+
+	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>URI='.$_SERVER['REQUEST_URI'].'<<<<<<<<<<<<<<<<<<<');
+	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>UAS='.$_SERVER['HTTP_USER_AGENT'].'<<<<<<<<<<<<<<<<<<<');
+	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>X_PL_VARIANT='.$_SERVER['HTTP_X_PL_VARIANT'].'<<<<<<<<<<<<<<<<<<<');
+	error_log(MT_PREFFIX . ">>>>>>>>>>>>>>>>>PressLabs parser is used(".$rez[$result].")<<<<<<<<<<<<<<<<<<<<<<<");
+
+	return $result;
 }
+
 //------------------------------------------------------------------------------
-// Jetpack hook
+// Jetpack (2.3.3) hook
 //
-if (has_filter('jetpack_check_mobile'))
+if ( is_plugin_active('jetpack/jetpack.php') ) {
 	add_filter('jetpack_check_mobile', 'mobile_theme_pl_uas_parser');
-if (has_filter('jetpack_is_mobile_filter'))
+	$use_mt_theme = false;
+	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>jetpack<<<<<<<<<<<<<<<<<<<');
+}
+if ( is_plugin_active('jetpack/jetpack.php') ) {
 	add_filter('jetpack_is_mobile_filter', 'mobile_theme_pl_uas_parser');
+	$use_mt_theme = false;
+	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>jetpack<<<<<<<<<<<<<<<<<<<');
+}
+
 //------------------------------------------------------------------------------
-// WordPress Mobile Pack hook
+// WordPress Mobile Pack (1.2.5) hook
+//
 // wordpress-mobile-pack/plugins/wpmp_switcher/wpmp_switcher.php: Line:459:
 //   return apply_filters('wordpress_mobile_pack_is_mobile_browser', $wpmp_switcher_is_mobile_browser);
-if (has_filter('wordpress_mobile_pack_is_mobile_browser'))
+if ( is_plugin_active('wordpress-mobile-pack/wordpress-mobile-pack.php') ) {
 	add_filter('wordpress_mobile_pack_is_mobile_browser', 'mobile_theme_pl_uas_parser');
+	$use_mt_theme = false;
+	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>wp mobile pack<<<<<<<<<<<<<<<<<<<');
+}
+
 //------------------------------------------------------------------------------
-// WPtouch hook
+// WPtouch (1.9.8) hook
+//
 // wptouch/wptouch.php: Line:688:
 // $is_mobile = $wptouch_plugin->applemobile && $wptouch_plugin->desired_view == 'mobile';
 // return apply_filters('bnc_wptouch_is_mobile_filter', $is_mobile);
-if (has_filter('bnc_wptouch_is_mobile_filter'))
+if ( is_plugin_active('wptouch/wptouch.php') ) {
 	add_filter('bnc_wptouch_is_mobile_filter', 'mobile_theme_pl_uas_parser');
-
-//------------------------------------------------------------------------------
-// User Agent String parser(based on http://notnotmobile.appspot.com/)
-function mobile_theme_user_agent_string_parser() {
-	$result = 'mobile';
-
-	$desktop_devices = array('windows','linux','os\s+[x9]','solaris','bsd');
-
-	$mobile_devices = array('iphone','ipod','android','blackberry','palm',
-		'windows\s+ce','windows phone','googlebot-mobile'
-	);
-
-	$bot_devices = array('spider','crawl','slurp','bot','feedburner',
-		'wordpress','mediapartners-google','apple-pubsub','presslabs-cdn',
-		'libwww-perl','php','java','ruby','python','appengine-google',
-		'pubsubhubbub','\+http://'
-	);
-
-	$user_agent_string = '#';
-	if ( isset($_SERVER['HTTP_USER_AGENT']) )
-		$user_agent_string = $_SERVER['HTTP_USER_AGENT'];
-
-	if ( $user_agent_string == '#' )
-		$result = 'desktop';
-
-	$user_agent_string = strtolower($user_agent_string);
-	//var_dump($user_agent_string); // for debug only
-
-	foreach ( $desktop_devices as $device )
-		if ( !(strpos($user_agent_string, $device) === false) )
-			$result = 'desktop';
-
-	foreach ( $mobile_devices as $device )
-		if ( !(strpos($user_agent_string, $device) === false) )
-			$result = 'mobile';
-
-	foreach ( $bot_devices as $device )
-		if ( !(strpos($user_agent_string, $device) === false) )
-			$result = 'bot';
-
-	// for windows mobile
-	if ( !(strpos($user_agent_string, 'windows phone') === false) )
-			$result = 'mobile';
-
-	return $result; // default returned value
+	$use_mt_theme = false;
+	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>wptouch<<<<<<<<<<<<<<<<<<<');
 }
 
 //------------------------------------------------------------------------------
-//  MOBILE THEME SETTINGS
-if ( ! isset($_SERVER['HTTP_X_PL_VARIANT']) )
-	$_SERVER['HTTP_X_PL_VARIANT'] = mobile_theme_user_agent_string_parser();
-
 isset($_SERVER['HTTP_X_PL_VARIANT']) ? $mobile_theme_variant = 
 	$_SERVER['HTTP_X_PL_VARIANT'] : $mobile_theme_variant = "desktop";
 
-//var_dump($mobile_theme_variant); // for debug only
-
 $mobile_theme_mobile_stylesheet = get_option('mobile_theme_mobile_theme_stylesheet');
-
 $mobile_theme = wp_get_theme($mobile_theme_mobile_stylesheet);
 $mobile_theme_mobile_theme = $mobile_theme->Name;
 $mobile_theme_mobile_template = $mobile_theme->Template;
 
 //------------------------------------------------------------------------------
 function mobile_theme_activate() {
-	mobile_theme_delete_options();
-
+	$mobile_theme_mobile_stylesheet = get_option('mobile_theme_mobile_theme_stylesheet','#');
 	$my_theme = wp_get_theme();
-	add_option('mobile_theme_mobile_theme_stylesheet',$my_theme->get_stylesheet());  
+	if ( $mobile_theme_mobile_stylesheet != '#' )
+		add_option('mobile_theme_mobile_theme_stylesheet',$my_theme->get_stylesheet());  
 }
 register_activation_hook(__FILE__,'mobile_theme_activate');
 
@@ -155,7 +135,8 @@ function mobile_theme_mobile_theme() {
 	add_filter( 'option_stylesheet', 'filter_stylesheet');
 	add_filter( 'option_template', 'filter_template');
 }
-add_action('plugins_loaded', 'mobile_theme_mobile_theme', 1999);
+if ( $use_mt_theme )
+	add_action('plugins_loaded', 'mobile_theme_mobile_theme');
 
 //------------------------------------------------------------------------------
 // Add settings link on plugin page.
@@ -191,7 +172,6 @@ function mobile_theme_options_page() {
 
 $themes = wp_get_themes();
 foreach($themes as $theme) {
-	//echo $theme->Name." (".$theme->stylesheet.", ".$theme->template.")<br />"; // for debug only
 	$themeNames[] = $theme->Name;
 	$themeStylesheet[] = $theme->stylesheet;
 }
