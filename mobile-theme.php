@@ -4,7 +4,7 @@
  * Tags: presslabs, theme, mobile, template, style, stylesheet, switches
  * Description: This plugin switches the current theme to the mobile one when it detects a mobile device. This plugin works only on PressLabs servers!
  * Author: PressLabs
- * Version: 1.3.1
+ * Version: 1.3.2
  * Author URI: http://www.presslabs.com/
 */
 
@@ -15,9 +15,37 @@ include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 define('MT_PREFFIX', "\n\rrand_" . mt_rand(100, 999) . ': ');
 
 //------------------------------------------------------------------------------
+function mobile_theme_is_mobile() {
+	$mobile_ua = "iphone|ipod|android|blackberry|palm|windows\s+ce|googlebot-mobile";
+	$mobile_ua = explode('|', $mobile_ua);
+
+	$desktop_ua = "windows|linux|os\s+[x9]|solaris|bsd";
+	$desktop_ua = explode('|', $desktop_ua);
+
+	$bot_ua = "spider|crawl|slurp|bot|feedburner|wordpress|mediapartners-google|apple-pubsub|presslabs-cdn|libwww-perl|php|java|ruby|python|appengine-google|pubsubhubbub|curl|wget|blitz|\+http://";
+	$bot_ua = explode('|', $bot_ua);
+
+	$ua = '';
+	if ( isset($_SERVER['HTTP_USER_AGENT']) ) {
+		$ua = strtolower($_SERVER['HTTP_USER_AGENT']);
+	}
+
+	if ( $ua == '' )
+		return 'mobile';
+	else if ( in_array($ua, $mobile_ua) )
+		return 'mobile';
+	else if ( in_array($ua, $desktop_ua) )
+		return 'desktop';
+	else if ( in_array($ua, $bot_ua) )
+		return 'desktop';
+
+	return 'desktop';
+}
+
+//------------------------------------------------------------------------------
 // Return PressLabs User Agent String Parser For Mobile Devices
 //
-function mobile_theme_pl_uas_parser() {
+function mobile_theme_presslabs_parser() {
 	$rez = array('DESKTOP','MOBIL');
 	$result = false; // by default is desktop
 
@@ -36,27 +64,55 @@ function mobile_theme_pl_uas_parser() {
 //------------------------------------------------------------------------------
 // Jetpack (2.3.3) hook
 //
-if ( is_plugin_active('jetpack/jetpack.php') ) {
-	add_filter('jetpack_check_mobile', 'mobile_theme_pl_uas_parser');
-	$use_mt_theme = false;
+define('JETPACK_PLUGIN_FILE', 'jetpack/jetpack.php');
+if ( is_plugin_active(JETPACK_PLUGIN_FILE) ) {
+	add_filter('jetpack_check_mobile', 'mobile_theme_presslabs_parser');
+	$mobile_theme_options = get_option('mobile_theme_options');
+	if ( $mobile_theme_options['jetpack'] != 'dismissed' ) {
+		$mobile_theme_options['jetpack'] = true;
+		update_option('mobile_theme_options', $mobile_theme_options);
+	}
 	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>jetpack<<<<<<<<<<<<<<<<<<<');
 }
-if ( is_plugin_active('jetpack/jetpack.php') ) {
-	add_filter('jetpack_is_mobile_filter', 'mobile_theme_pl_uas_parser');
-	$use_mt_theme = false;
+if ( is_plugin_active(JETPACK_PLUGIN_FILE) ) {
+	add_filter('jetpack_is_mobile_filter', 'mobile_theme_presslabs_parser');
+	$mobile_theme_options = get_option('mobile_theme_options');
+	if ( $mobile_theme_options['jetpack'] != 'dismissed' ) {
+		$mobile_theme_options['jetpack'] = true;
+		update_option('mobile_theme_options', $mobile_theme_options);
+	}
 	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>jetpack<<<<<<<<<<<<<<<<<<<');
 }
+function mobile_theme_deactivate_jetpack() {
+	$mobile_theme_options = get_option('mobile_theme_options');
+	$mobile_theme_options['jetpack'] = false;
+	update_option('mobile_theme_options', $mobile_theme_options);
+}
+$jetpack_file = str_replace('mobile-theme/mobile-theme.php',JETPACK_PLUGIN_FILE,__FILE__);
+register_deactivation_hook($jetpack_file, 'mobile_theme_deactivate_jetpack');
 
 //------------------------------------------------------------------------------
 // WordPress Mobile Pack (1.2.5) hook
 //
 // wordpress-mobile-pack/plugins/wpmp_switcher/wpmp_switcher.php: Line:459:
 //   return apply_filters('wordpress_mobile_pack_is_mobile_browser', $wpmp_switcher_is_mobile_browser);
-if ( is_plugin_active('wordpress-mobile-pack/wordpress-mobile-pack.php') ) {
-	add_filter('wordpress_mobile_pack_is_mobile_browser', 'mobile_theme_pl_uas_parser');
-	$use_mt_theme = false;
-	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>wp mobile pack<<<<<<<<<<<<<<<<<<<');
+define('WORDPRESS_MOBILE_PACK_PLUGIN_FILE', 'wordpress-mobile-pack/wordpress-mobile-pack.php');
+if ( is_plugin_active(WORDPRESS_MOBILE_PACK_PLUGIN_FILE) ) {
+	add_filter('wordpress_mobile_pack_is_mobile_browser', 'mobile_theme_presslabs_parser');
+	$mobile_theme_options = get_option('mobile_theme_options');
+	if ( $mobile_theme_options['wordpress-mobile-pack'] != 'dismissed' ) {
+		$mobile_theme_options['wordpress-mobile-pack'] = true;
+		update_option('mobile_theme_options', $mobile_theme_options);
+	}
+	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>wordpress-mobile-pack<<<<<<<<<<<<<<<<<<<');
 }
+function mobile_theme_deactivate_wordpress_mobile_pack() {
+	$mobile_theme_options = get_option('mobile_theme_options');
+	$mobile_theme_options['wordpress-mobile-pack'] = false;
+	update_option('mobile_theme_options', $mobile_theme_options);
+}
+$wordpress_mobile_pack_file = str_replace('mobile-theme/mobile-theme.php',WORDPRESS_MOBILE_PACK_PLUGIN_FILE,__FILE__);
+register_deactivation_hook($wordpress_mobile_pack_file, 'mobile_theme_deactivate_wordpress_mobile_pack');
 
 //------------------------------------------------------------------------------
 // WPtouch (1.9.8) hook
@@ -64,27 +120,51 @@ if ( is_plugin_active('wordpress-mobile-pack/wordpress-mobile-pack.php') ) {
 // wptouch/wptouch.php: Line:688:
 // $is_mobile = $wptouch_plugin->applemobile && $wptouch_plugin->desired_view == 'mobile';
 // return apply_filters('bnc_wptouch_is_mobile_filter', $is_mobile);
-if ( is_plugin_active('wptouch/wptouch.php') ) {
-	add_filter('bnc_wptouch_is_mobile_filter', 'mobile_theme_pl_uas_parser');
-	$use_mt_theme = false;
+define('WPTOUCH_PLUGIN_FILE', 'wptouch/wptouch.php');
+if ( is_plugin_active(WPTOUCH_PLUGIN_FILE) ) {
+	add_filter('bnc_wptouch_is_mobile_filter', 'mobile_theme_presslabs_parser');
+	$mobile_theme_options = get_option('mobile_theme_options');
+	if ( $mobile_theme_options['wptouch'] != 'dismissed' ) {
+		$mobile_theme_options['wptouch'] = true;
+		update_option('mobile_theme_options', $mobile_theme_options);
+	}
 	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>wptouch<<<<<<<<<<<<<<<<<<<');
 }
+function mobile_theme_deactivate_wptouch() {
+	$mobile_theme_options = get_option('mobile_theme_options');
+	$mobile_theme_options['wptouch'] = false;
+	update_option('mobile_theme_options', $mobile_theme_options);
+}
+$wptouch_file = str_replace('mobile-theme/mobile-theme.php',WPTOUCH_PLUGIN_FILE,__FILE__);
+register_deactivation_hook($wptouch_file, 'mobile_theme_deactivate_wptouch');
 
 //------------------------------------------------------------------------------
 isset($_SERVER['HTTP_X_PL_VARIANT']) ? $mobile_theme_variant = 
-	$_SERVER['HTTP_X_PL_VARIANT'] : $mobile_theme_variant = "desktop";
+	$_SERVER['HTTP_X_PL_VARIANT'] : $mobile_theme_variant = mobile_theme_is_mobile();
 
-$mobile_theme_mobile_stylesheet = get_option('mobile_theme_mobile_theme_stylesheet');
-$mobile_theme = wp_get_theme($mobile_theme_mobile_stylesheet);
-$mobile_theme_mobile_theme = $mobile_theme->Name;
-$mobile_theme_mobile_template = $mobile_theme->Template;
+$mobile_theme_options = get_option('mobile_theme_options');
+$mobile_theme_stylesheet = $mobile_theme_options['stylesheet'];
+
+$mobile_theme = wp_get_theme($mobile_theme_stylesheet);
+$mobile_theme_current_theme = $mobile_theme->Name;
+$mobile_theme_template = $mobile_theme->Template;
 
 //------------------------------------------------------------------------------
 function mobile_theme_activate() {
-	$mobile_theme_mobile_stylesheet = get_option('mobile_theme_mobile_theme_stylesheet','#');
+	delete_option('mobile_theme_mobile_theme_stylesheet');
+
+	$mobile_theme_options = get_option('mobile_theme_options');
+	$mobile_theme_stylesheet = $mobile_theme_options['stylesheet'];
 	$my_theme = wp_get_theme();
-	if ( $mobile_theme_mobile_stylesheet != '#' )
-		add_option('mobile_theme_mobile_theme_stylesheet',$my_theme->get_stylesheet());  
+	if ( $mobile_theme_stylesheet != '#' )
+		add_option('mobile_theme_options',
+			array(
+				'stylesheet' => $my_theme->get_stylesheet(),
+				'jetpack' => false,
+				'wordpress-mobile-pack' => false,
+				'wptouch' => false
+			)
+		);  
 }
 register_activation_hook(__FILE__,'mobile_theme_activate');
 
@@ -96,47 +176,48 @@ register_deactivation_hook(__FILE__,'mobile_theme_deactivate');
 
 //------------------------------------------------------------------------------
 function mobile_theme_delete_options() {
-	delete_option('mobile_theme_mobile_theme_stylesheet');
+	delete_option('mobile_theme_options');
 }
 
 //------------------------------------------------------------------------------
 function filter_current_theme($content) {
-	global $mobile_theme_mobile_theme, $mobile_theme_variant;
+	global $mobile_theme_current_theme, $mobile_theme_variant;
 
 	if ( $mobile_theme_variant == "mobile" )
-		$content = str_ireplace($content, $mobile_theme_mobile_theme, $content);
+		$content = str_ireplace($content, $mobile_theme_current_theme, $content);
 
 	return $content;
 }
 
 //------------------------------------------------------------------------------
 function filter_stylesheet($content) {
-	global $mobile_theme_mobile_stylesheet, $mobile_theme_variant;
+	global $mobile_theme_stylesheet, $mobile_theme_variant;
 
 	if ( $mobile_theme_variant == "mobile" )
-		$content = str_ireplace($content,$mobile_theme_mobile_stylesheet,$content);
+		$content = str_ireplace($content,$mobile_theme_stylesheet,$content);
 
     return $content;
 }
 
 //------------------------------------------------------------------------------
 function filter_template($content) {
-	global $mobile_theme_mobile_template, $mobile_theme_variant;
+	global $mobile_theme_template, $mobile_theme_variant;
 
 	if ( $mobile_theme_variant == "mobile" )
-		$content = str_ireplace($content,$mobile_theme_mobile_template,$content);
+		$content = str_ireplace($content,$mobile_theme_template,$content);
 
     return $content;
 }
 
 //------------------------------------------------------------------------------
-function mobile_theme_mobile_theme() {
-	add_filter( 'option_current_theme', 'filter_current_theme');
-	add_filter( 'option_stylesheet', 'filter_stylesheet');
-	add_filter( 'option_template', 'filter_template');
+function mobile_theme_switch() {
+	if ( mobile_theme_hooked_plugin() === false ) {
+		add_filter( 'option_current_theme', 'filter_current_theme');
+		add_filter( 'option_stylesheet', 'filter_stylesheet');
+		add_filter( 'option_template', 'filter_template');
+	}
 }
-if ( $use_mt_theme )
-	add_action('plugins_loaded', 'mobile_theme_mobile_theme');
+add_action('plugins_loaded', 'mobile_theme_switch');
 
 //------------------------------------------------------------------------------
 // Add settings link on plugin page.
@@ -163,27 +244,83 @@ function mobile_theme_menu() {
 add_action('admin_menu', 'mobile_theme_menu');
 
 //------------------------------------------------------------------------------
-function mobile_theme_options_page() {
+function mobile_theme_hooked_plugin() {
+	$mobile_theme_options = get_option('mobile_theme_options');
+	foreach( $mobile_theme_options as $index => $value )
+		if ( ($value === 'dismissed') or ($value === true) )
+			return $index;
 
-	if ( isset($_POST['submit_mobile_theme_stylesheet']) ) {
-		update_option('mobile_theme_mobile_theme_stylesheet', 
-			$_POST['mobile_theme_stylesheet']);
-	}
-
-$themes = wp_get_themes();
-foreach($themes as $theme) {
-	$themeNames[] = $theme->Name;
-	$themeStylesheet[] = $theme->stylesheet;
+	return false;
 }
 
-$mobile_theme_stylesheet = get_option('mobile_theme_mobile_theme_stylesheet');
+//------------------------------------------------------------------------------
+function mobile_theme_dismiss_message() {
+	$mobile_theme_options = get_option('mobile_theme_options');
+	$is_hooked_plugin = false;
+	foreach( $mobile_theme_options as $index => $value )
+		if ($value === true) {
+			$hooked_plugin = $index;
+			$is_hooked_plugin = true;
+			break;
+		}
+	if ($is_hooked_plugin) {
+		$hooked_plugin_message = str_ireplace('-', ' ', $hooked_plugin);
+		$hooked_plugin_message = ucwords($hooked_plugin_message);
+		$plugin_link = mobile_theme_return_settings_link();
+		$nonce = wp_create_nonce( 'mobile-theme-dismiss-nonce' );
+		$dismiss_link = "<a href=".$plugin_link."&hooked_plugin=$hooked_plugin&_wpnonce=$nonce>Dismiss</a>";
+		echo "<div id='message' class='updated'><p>Mobile Theme plugin is hooked to $hooked_plugin_message $dismiss_link</p></div>";
+	}
+}
+
+//------------------------------------------------------------------------------
+function mobile_theme_init() {
+	$nonce = $_REQUEST['_wpnonce'];
+	if ( wp_verify_nonce( $nonce, 'mobile-theme-dismiss-nonce' ) ) {
+	    $hooked_plugin = $_GET['hooked_plugin'];
+		$mobile_theme_options = get_option('mobile_theme_options');
+		$mobile_theme_options[ $hooked_plugin ] = 'dismissed';
+		update_option('mobile_theme_options', $mobile_theme_options);
+	}
+	add_action('admin_notices', 'mobile_theme_dismiss_message');
+}
+add_action('init', 'mobile_theme_init');
+
+//------------------------------------------------------------------------------
+function mobile_theme_options_page() {
+	$mobile_theme_options = get_option('mobile_theme_options');
+	$mobile_theme_stylesheet = $mobile_theme_options['stylesheet'];
+
+	if ( isset($_POST['submit_mobile_theme_stylesheet']) ) {
+		$mobile_theme_options['stylesheet'] = $_POST['mobile_theme_stylesheet'];
+		$mobile_theme_stylesheet = $mobile_theme_options['stylesheet'];
+		update_option('mobile_theme_options', $mobile_theme_options);
+	}
+
+
+	$themes = wp_get_themes();
+	foreach($themes as $theme) {
+		$themeNames[] = $theme->Name;
+		$themeStylesheet[] = $theme->stylesheet;
+	}
+
 ?>
 
 <div class="wrap">
 <div id="icon-themes" class="icon32">&nbsp;</div>
 
 <h2>Mobile Theme</h2>
-  
+<?php
+	$mobile_theme_disabled = '';
+	$hooked_plugin = mobile_theme_hooked_plugin();
+	if ( $hooked_plugin ) {
+		$mobile_theme_disabled = ' disabled';
+
+		$hooked_plugin_message = str_ireplace('-', ' ', $hooked_plugin);
+		$hooked_plugin_message = ucwords($hooked_plugin_message);
+		$mobile_theme_disabled_message = " <span style='color:red;'>Mobile Theme plugin is hooked to $hooked_plugin_message.</span>";
+	}
+?>  
 <table class="wp-list-table widefat fixed bookmarks">
         <thead>
             <tr>
@@ -198,7 +335,7 @@ $mobile_theme_stylesheet = get_option('mobile_theme_mobile_theme_stylesheet');
         <tr valign="top">
         <th scope="row">Mobile Theme:</th>
         <td>
-        	<select name="mobile_theme_stylesheet">
+        	<select name="mobile_theme_stylesheet"<?php echo$mobile_theme_disabled;?>>
 			 <?php $k = 0;
               foreach ($themeNames as $themeName) {
                   if ( $mobile_theme_stylesheet == $themeStylesheet[$k] ) {
@@ -212,7 +349,7 @@ $mobile_theme_stylesheet = get_option('mobile_theme_mobile_theme_stylesheet');
 				$k++;
               }
              ?>
-        	</select>
+        	</select> <?php echo$mobile_theme_disabled_message;?>
         </td>
         </tr>
 
@@ -221,7 +358,8 @@ $mobile_theme_stylesheet = get_option('mobile_theme_mobile_theme_stylesheet');
         <td>
         	<input type="submit" class="button-primary" 
 				name="submit_mobile_theme_stylesheet" 
-				value="<?php _e('Save Changes') ?>" />
+				value="<?php _e('Save Changes') ?>" 
+				<?php echo$mobile_theme_disabled;?>/>
         </td>
         </tr>
     </table>

@@ -3,7 +3,7 @@ Contributors: PressLabs
 Donate link: http://www.presslabs.com/
 Requires at least: 3.5
 Tested up to: 3.5.1
-Stable tag: 1.3
+Stable tag: 1.3.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -21,8 +21,14 @@ https://github.com/PressLabs/mobile-theme
 To install, simple extract the 'mobile-theme.php' file into your 'wp-content/plugins/' directory and activate the plugin.
 
 == Changelog ==
+= 1.3.2 =
+* add hook notification in WP Dashboard and disable the Mobile Theme selector. Fix some code in mobile theme standalone parser.
+
+= 1.3.1 =
+* fix hooks in WPtouch(1.9.8)
+
 = 1.3 =
-* add Jetpack, WordPress Mobile Pack and WPtouch plugins User Agent String parser hook to PressLabs parser
+* add Jetpack(2.3.3), WordPress Mobile Pack(1.2.5) and WPtouch(1.9.8) plugins User Agent String parser hook to PressLabs parser
 
 = 1.2 =
 * add User Agent String parser(now the plugin is working on every server not only on PressLabs servers)
@@ -34,6 +40,12 @@ To install, simple extract the 'mobile-theme.php' file into your 'wp-content/plu
 * initial release
 
 == Upgrade Notice ==
+= 1.3.2 =
+Add hook notification in WP Dashboard and disable the Mobile Theme selector. Fix some code in mobile theme standalone parser.
+
+= 1.3.1 =
+Fix hooks in WPtouch(1.9.8)
+
 = 1.3 =
 Add Jetpack, WordPress Mobile Pack and WPtouch plugins User Agent String parser hook to PressLabs parser.
 
