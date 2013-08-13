@@ -13,6 +13,7 @@ $use_mt_theme = true;
 include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
 define('MT_PREFFIX', "\n\rrand_" . mt_rand(100, 999) . ': ');
+define('MT_DEBUG_MODE', false);
 
 //------------------------------------------------------------------------------
 function mobile_theme_is_mobile() {
@@ -52,12 +53,12 @@ function mobile_theme_presslabs_parser() {
 	if ( isset($_SERVER['HTTP_X_PL_VARIANT']) )
 		if ( $_SERVER['HTTP_X_PL_VARIANT']=='mobile' )
 			$result = true; // is mobile
-
+	if (MT_DEBUG_MODE) {
 	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>URI='.$_SERVER['REQUEST_URI'].'<<<<<<<<<<<<<<<<<<<');
 	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>UAS='.$_SERVER['HTTP_USER_AGENT'].'<<<<<<<<<<<<<<<<<<<');
 	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>X_PL_VARIANT='.$_SERVER['HTTP_X_PL_VARIANT'].'<<<<<<<<<<<<<<<<<<<');
 	error_log(MT_PREFFIX . ">>>>>>>>>>>>>>>>>PressLabs parser is used(".$rez[$result].")<<<<<<<<<<<<<<<<<<<<<<<");
-
+	}
 	return $result;
 }
 
@@ -72,7 +73,7 @@ if ( is_plugin_active(JETPACK_PLUGIN_FILE) ) {
 		$mobile_theme_options['jetpack'] = true;
 		update_option('mobile_theme_options', $mobile_theme_options);
 	}
-	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>jetpack<<<<<<<<<<<<<<<<<<<');
+	if (MT_DEBUG_MODE) error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>jetpack<<<<<<<<<<<<<<<<<<<');
 }
 if ( is_plugin_active(JETPACK_PLUGIN_FILE) ) {
 	add_filter('jetpack_is_mobile_filter', 'mobile_theme_presslabs_parser');
@@ -81,7 +82,7 @@ if ( is_plugin_active(JETPACK_PLUGIN_FILE) ) {
 		$mobile_theme_options['jetpack'] = true;
 		update_option('mobile_theme_options', $mobile_theme_options);
 	}
-	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>jetpack<<<<<<<<<<<<<<<<<<<');
+	if (MT_DEBUG_MODE) error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>jetpack<<<<<<<<<<<<<<<<<<<');
 }
 function mobile_theme_deactivate_jetpack() {
 	$mobile_theme_options = get_option('mobile_theme_options');
@@ -104,7 +105,7 @@ if ( is_plugin_active(WORDPRESS_MOBILE_PACK_PLUGIN_FILE) ) {
 		$mobile_theme_options['wordpress-mobile-pack'] = true;
 		update_option('mobile_theme_options', $mobile_theme_options);
 	}
-	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>wordpress-mobile-pack<<<<<<<<<<<<<<<<<<<');
+	if (MT_DEBUG_MODE) error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>wordpress-mobile-pack<<<<<<<<<<<<<<<<<<<');
 }
 function mobile_theme_deactivate_wordpress_mobile_pack() {
 	$mobile_theme_options = get_option('mobile_theme_options');
@@ -128,7 +129,7 @@ if ( is_plugin_active(WPTOUCH_PLUGIN_FILE) ) {
 		$mobile_theme_options['wptouch'] = true;
 		update_option('mobile_theme_options', $mobile_theme_options);
 	}
-	error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>wptouch<<<<<<<<<<<<<<<<<<<');
+	if (MT_DEBUG_MODE) error_log(MT_PREFFIX . '>>>>>>>>>>>>>>>>>wptouch<<<<<<<<<<<<<<<<<<<');
 }
 function mobile_theme_deactivate_wptouch() {
 	$mobile_theme_options = get_option('mobile_theme_options');
