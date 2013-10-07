@@ -51,7 +51,7 @@ function mobile_theme_presslabs_parser() {
 	$result = false; // by default is desktop
 
 	if ( isset( $_SERVER['HTTP_X_PL_VARIANT']) )
-		if ( 'mobile' = $_SERVER['HTTP_X_PL_VARIANT'] )
+		if ( 'mobile' == $_SERVER['HTTP_X_PL_VARIANT'] )
 			$result = true; // is mobile
 	if ( MT_DEBUG_MODE ) {
 		error_log( MT_PREFFIX . '>>>>>>>>>>>>>>>>>URI=' . $_SERVER['REQUEST_URI'] . '<<<<<<<<<<<<<<<<<<<' );
