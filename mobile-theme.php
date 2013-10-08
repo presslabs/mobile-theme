@@ -310,6 +310,11 @@ function mobile_theme_options_page() {
 
 <h2>Mobile Theme</h2>
 <?php
+	if ( isset($_POST['submit_mobile_theme_stylesheet']) ) {
+		update_option('mobile_theme_mobile_theme_stylesheet', esc_html( $_POST['mobile_theme_stylesheet'] ) );
+		echo '<div class="updated fade"><p>Options updated!</p></div>';
+	}
+
 	$mobile_theme_disabled = '';
 	$hooked_plugin = mobile_theme_hooked_plugin();
 	if ( $hooked_plugin ) {
