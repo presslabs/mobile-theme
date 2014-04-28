@@ -82,7 +82,7 @@ if ( is_plugin_active( JETPACK_PLUGIN_FILE ) ) {
 		$mobile_theme_options['jetpack'] = true;
 		update_option( 'mobile_theme_options', $mobile_theme_options );
 	}
-	if ( MT_DsEBUG_MODE ) error_log( MT_PREFFIX . '>>>>>>>>>>>>>>>>>jetpack<<<<<<<<<<<<<<<<<<<' );
+	if ( MT_DEBUG_MODE ) error_log( MT_PREFFIX . '>>>>>>>>>>>>>>>>>jetpack<<<<<<<<<<<<<<<<<<<' );
 }
 function mobile_theme_deactivate_jetpack() {
 	$mobile_theme_options = get_option( 'mobile_theme_options' );
