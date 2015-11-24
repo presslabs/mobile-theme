@@ -1,4 +1,4 @@
 mobile-theme
 ============
 
-Mobile theme switcher for PressLabs based sites
+Mobile theme switcher for Presslabs based sites

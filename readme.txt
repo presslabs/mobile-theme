@@ -14,7 +14,7 @@ This plugin switches the current theme to the mobile one when it detects a mobil
 This plugin switches the current theme to the mobile one when it detects a mobile device.
 
 = Github repository =
-https://github.com/PressLabs/mobile-theme
+https://github.com/presslabs/mobile-theme
 
 == Installation ==
 
@@ -28,10 +28,10 @@ To install, simple extract the 'mobile-theme.php' file into your 'wp-content/plu
 * fix hooks in WPtouch(1.9.8)
 
 = 1.3 =
-* add Jetpack(2.3.3), WordPress Mobile Pack(1.2.5) and WPtouch(1.9.8) plugins User Agent String parser hook to PressLabs parser
+* add Jetpack(2.3.3), WordPress Mobile Pack(1.2.5) and WPtouch(1.9.8) plugins User Agent String parser hook to Presslabs parser
 
 = 1.2 =
-* add User Agent String parser(now the plugin is working on every server not only on PressLabs servers)
+* add User Agent String parser(now the plugin is working on every server not only on Presslabs servers)
 
 = 1.1 =
 * add header 'X-PL-Mobilized'
@@ -47,10 +47,10 @@ Add hook notification in WP Dashboard and disable the Mobile Theme selector. Fix
 Fix hooks in WPtouch(1.9.8)
 
 = 1.3 =
-Add Jetpack, WordPress Mobile Pack and WPtouch plugins User Agent String parser hook to PressLabs parser.
+Add Jetpack, WordPress Mobile Pack and WPtouch plugins User Agent String parser hook to Presslabs parser.
 
 = 1.2 =
-Add User Agent String parser(now the plugin is working on every server not only on PressLabs servers).
+Add User Agent String parser(now the plugin is working on every server not only on Presslabs servers).
 
 = 1.1 =
 Add header 'X-PL-Mobilized'
