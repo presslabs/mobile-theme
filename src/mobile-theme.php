@@ -3,9 +3,9 @@
  * Plugin Name: Mobile Theme
  * Tags: presslabs, theme, mobile, template, style, stylesheet, switches
  * Description: This plugin switches the current theme to the mobile one when it detects a mobile device. This plugin works only on Presslabs servers!
- * Author: PressLabs
- * Version: 1.3.2
- * Author URI: http://www.presslabs.com/
+ * Author: Presslabs
+ * Version: 1.3.3
+ * Author URI: https://www.presslabs.com/
  */
 
 $use_mt_theme = true;
