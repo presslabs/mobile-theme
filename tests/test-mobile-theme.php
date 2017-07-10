@@ -12,6 +12,6 @@ class MobileThemeTest extends WP_UnitTestCase {
 	}
 
 	public function test_sample() {
-     $this->asssertTrue(true);
-  }
+		$this->assertTrue( true );
+	}
 }
