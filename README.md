@@ -1,7 +1,7 @@
 Mobile theme
 ============
 
-[![Build Status](https://travis-ci.org/PressLabs/autover.svg?branch=master)](https://travis-ci.org/PressLabs/autover)
+[![Build Status](https://travis-ci.org/PressLabs/mobile-theme.svg?branch=master)](https://travis-ci.org/PressLabs/mobile-theme)
 
 
 Description
