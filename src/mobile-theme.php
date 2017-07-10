@@ -3,9 +3,9 @@
  * Plugin Name: Mobile Theme
  * Tags: presslabs, theme, mobile, template, style, stylesheet, switches
  * Description: This plugin switches the current theme to the mobile one when it detects a mobile device. This plugin works only on Presslabs servers!
- * Author: PressLabs
- * Version: 1.3.2
- * Author URI: http://www.presslabs.com/
+ * Author: Presslabs
+ * Version: 1.3.3
+ * Author URI: https://www.presslabs.com/
  */
 
 $use_mt_theme = true;
@@ -233,7 +233,8 @@ function mobile_theme_menu() {
 }
 
 function mobile_theme_hooked_plugin() {
-	$mobile_theme_options = get_option( 'mobile_theme_options' );
+	$mobile_theme_options = get_option( 'mobile_theme_options', [] );
+
 	foreach ( $mobile_theme_options as $index => $value ) {
 		if ( ( 'dismissed' === $value ) or ( true === $value ) ) {
 			return $index;
@@ -244,7 +245,7 @@ function mobile_theme_hooked_plugin() {
 }
 
 function mobile_theme_dismiss_message() {
-	$mobile_theme_options = get_option( 'mobile_theme_options' );
+	$mobile_theme_options = get_option( 'mobile_theme_options', [] );
 	$is_hooked_plugin     = false;
 	foreach ( $mobile_theme_options as $index => $value ) {
 		if ( true === $value ) {
@@ -266,7 +267,7 @@ function mobile_theme_dismiss_message() {
 
 add_action( 'init', 'mobile_theme_init' );
 function mobile_theme_init() {
-	$nonce = $_REQUEST['_wpnonce'];
+	$nonce = isset($_REQUEST['_wpnonce']) ? $_REQUEST['_wpnonce']: '';
 	if ( wp_verify_nonce( $nonce, 'mobile-theme-dismiss-nonce' ) ) {
 	    $hooked_plugin = $_GET['hooked_plugin'];
 		$mobile_theme_options = get_option( 'mobile_theme_options' );
@@ -277,7 +278,7 @@ function mobile_theme_init() {
 }
 
 function mobile_theme_options_page() {
-	$mobile_theme_options = get_option( 'mobile_theme_options' );
+	$mobile_theme_options = get_option( 'mobile_theme_options', []);
 	$mobile_theme_stylesheet = $mobile_theme_options['stylesheet'];
 
 	if ( isset( $_POST['submit_mobile_theme_stylesheet'] ) ) {

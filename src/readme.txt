@@ -2,7 +2,7 @@
 Contributors: PressLabs
 Donate link: http://www.presslabs.com/
 Requires at least: 3.5
-Tested up to: 4.5.1
+Tested up to: 4.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -20,6 +20,9 @@ https://github.com/presslabs/mobile-theme
 To install, simple extract the 'mobile-theme.php' file into your 'wp-content/plugins/' directory and activate the plugin.
 
 == Changelog ==
+= 1.3.3 =
+* Standardised folder structure
+
 = 1.3.2 =
 * add hook notification in WP Dashboard and disable the Mobile Theme selector. Fix some code in mobile theme standalone parser.
 
